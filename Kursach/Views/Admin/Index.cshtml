@@ -1,0 +1,124 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+<script src="~/Scripts/datepicker/jquery-ui.js"></script>
+
+
+
+<link rel="stylesheet" href="~/Content/jqGrid/ui.jqgrid.css">
+<link rel="stylesheet" href="~/Content/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="~/Content/css/Admin.css">
+<script src="~/Scripts/Graphics/highcharts.js"></script>
+@*<script src="~/Scripts/Graphics/highcharts-3d.js"></script>*@
+<script src="~/Scripts/Graphics/exporting.js"></script>
+
+<script src="~/Scripts/Admin/AjaxMethods.js"></script>
+<script src="~/Scripts/Admin/helpers.js"></script>
+
+<script src="~/Scripts/Admin/TouristsActivity.js"></script>
+<script src="~/Scripts/Admin/HikesLen.js"></script>
+<script src="~/Scripts/Admin/TouristsStrength.js"></script>
+<script src="~/Scripts/Admin/headHikes.js"></script>
+@Html.Partial("~/Views/Admin/HikePhotos.cshtml")
+<div id="mainContainer">
+    <myselect>
+        <select id="typeInfoSelect" onchange="ChangeInfoType()">
+            <option value="operate">Оперативная информация</option>
+            <option value="dictionary">Справочная информация</option>
+            <option value="analysis">Анализ</option>
+        </select>
+    </myselect>
+    <div id="tabContainer">
+        <div class="activeTab" title="hikesList" type="operate" onclick="TabOpen(this, this.title)">Походы</div>
+        <div class="tab" title="touristsList" type="operate" onclick="TabOpen(this, this.title)">Туристы</div>
+        <div class="tab" title="headsList" type="operate" onclick="TabOpen(this, this.title)">Руководители</div>
+        <div class="tab" title="pathList" type="dictionary" onclick="TabOpen(this, this.title)">Маршруты</div>
+        <div class="tab" title="cities" type="dictionary" onclick="TabOpen(this, this.title)">Города</div>
+        <div class="tab" title="kayaksList" type="dictionary" onclick="TabOpen(this, this.title)">Байдарки</div>
+        <div class="tab" title="activity" type="analysis" onclick="TabOpen(this, this.title)">Активность</div>
+        <div class="tab" title="hikesLen" type="analysis" onclick="TabOpen(this, this.title)">Длительность походов</div>
+        <div class="tab" title="touristsStrength" type="analysis" onclick="TabOpen(this, this.title)">Возраст туристов</div>
+        <div class="tab" title="headHikes" type="analysis" onclick="TabOpen(this, this.title)">Прошедшие походы</div>
+    </div><br />
+    <div id="jqGrid">
+        <div style="padding-top: 20px">
+        <!--Hikes list grid -->
+        <table id="hikesList" class="opened"></table>
+        <div id="hikesListJpager"></div>
+        <!--Tourist list grid -->
+        <table id="touristsList"></table>
+        <div id="touristsListJpager"></div>
+        <!--Heads list grid -->
+        <table id="headsList"></table>
+        <div id="headsListJpager"></div>
+        <!--Ways list grid -->
+        <table id="pathList"></table>
+        <div id="pathListJpager"></div>
+        <!--Kayaks list grid -->
+        <table id="kayaksList"></table>
+        <div id="kayaksListJpager"></div>
+        <!--Cities list editor===============================-->        
+        <div id="gbox_cities">
+            <div style="padding: 20px; padding-top: 0px; width: 98%">
+                <label>Список доступных городов:</label>
+                <select id="citiesList" multiple="multiple"></select>
+                <label>Название города:</label> 
+                <input id="cityNameInput" type="text" oninput='$("#cityNameInput").css("background-color", "white");'/>
+                <button class="button28" id="btnAddCity" onclick="addCity()">Добавить</button>
+                <button class="button28" id="btnDelCity" onclick="delCities()">Удалить</button>
+                <button class="button28" onclick="EditCity(this)">Править</button>
+            </div>
+        </div>       
+        <!--End cities list editor ================================-->
+        <!--Tourists activity===============================-->
+        <div id="gbox_activity">
+            <div style="padding: 20px; padding-top: 0px; width: 98%">
+                <div class="chart" id="activityChart">
+                </div>
+                <button class="button9" onclick="GetTouristsActivity(TouristsActivityChartDrawing)">Обновить</button>
+            </div>
+        </div>
+        <!--End tourists activity ================================-->
+        <!--Hikes length===============================-->
+        <div id="gbox_hikesLen">
+            <div style="padding: 20px; padding-top: 0px; width: 98%">
+                <div class="chart" id="hikesLenChart">
+                </div>
+                <button class="button9" onclick="GetHikesLen(HikesLenChartDrawing)">Обновить</button>
+            </div>
+        </div>
+        <!--End Hikes length ================================-->
+        <!--touristsStrength===============================-->
+        <div id="gbox_touristsStrength">
+            <div style="padding: 20px; padding-top: 0px; width: 98%">
+                <div class="chart" id="touristsStrengthPieChart">
+                </div>
+                <button class="button9" onclick="GetSeriesTouristsStrength(BuiltTouristStrengthPieChart)">Обновить</button>
+            </div>
+        </div>
+        <!--End touristsStrength ================================-->
+        <!--headHikes===============================-->
+        <div id="gbox_headHikes">
+            <div style="padding: 20px; padding-top: 0px; width: 98%">
+                <select id="headsNames"  disabled class="myselect" onchange="ShowHeadHikes()"></select>
+                <div id="headHikes">
+                </div>
+                <button class="button9" onclick="UpdHeadHikes()">Обновить</button>
+                <button class="button9" onclick="Print()">Печать</button>
+            </div>
+        </div>
+        <!--End headHikes ================================-->
+        <script src="~/Scripts/Admin/GridsValidation.js"></script>
+        <script src="~/Scripts/Admin/TouristsSubgrid.js"></script>
+        <script src="~/Scripts/Admin/HikesGrid.js"></script>
+        <script src="~/Scripts/Admin/TouristGrid.js"></script>
+        <script src="~/Scripts/Admin/HeadsGrid.js"></script>
+        <script src="~/Scripts/Admin/PathGrid.js"></script>
+        <script src="~/Scripts/Admin/KayaksGrid.js"></script>
+            </div>
+    </div>
+</div>
+
+<div id="message">
+  
+</div>
