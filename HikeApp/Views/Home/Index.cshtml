@@ -1,0 +1,103 @@
+﻿@model  HikeApp.ViewModels.HomeIndexViewModel
+@{
+    ViewBag.Title = "Домашняя страница";
+}
+
+<link rel="stylesheet" href="~/Content/css/Home.css">
+<script src="~/Scripts/Home/helpers.js"></script>
+<script src="~/Scripts/datepicker/jquery-ui.js"></script>
+<script src="~/Scripts/Home/FilterFunctions.js"></script>
+<link href="~/Content/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+@Html.Partial("~/Views/Home/RegistrationToHike.cshtml", Model.IsTourist)
+
+<div id="hikesFilter">
+    <div class="hikeFilter">
+        <label class="filterTitle">Руководитель</label>
+        <input id="headFilterInput" oninput="headFilterActivate()"/>
+        <img class="btnClearFilter" onclick="ClearFilter('head')" src="\Images\clear.png"/>
+    </div>
+    <div class="hikeFilter">
+        <label>Дата начала (от)</label>
+        <input id="dateBeginFilterInput" readonly onchange="dateBeginFilterActivate()"/>
+        <img class="btnClearFilter" onclick="ClearFilter('dateBegin')" src="\Images\clear.png"/>
+    </div>
+    <div class="hikeFilter">
+        <label>Дата конца (до)</label>
+        <input id="dateEndFilterInput" readonly onchange="dateEndFilterActivate()"/>
+        <img class="btnClearFilter" onclick="ClearFilter('dateEnd')" src="\Images\clear.png"/>
+    </div>
+    <div class="hikeFilter">
+        <label>Сложность (<)</label>
+        <input id="difficultyFilterInput" oninput="difficultyFilterActivate()"/>
+        <img class="btnClearFilter" onclick="ClearFilter('difficulty')" src="\Images\clear.png"/>
+    </div>
+    <div class="hikeFilter">
+        <label>Цена (100-200) </label>
+        <input id="priceFilterInput" oninput="priceFilterActivate()"/>
+        <img class="btnClearFilter" onclick="ClearFilter('price')" src="\Images\clear.png"/>
+    </div>
+</div>
+<div class="hikesMainContainer" onmousedown="return false" onselectstart="return false">
+    @foreach (var i in Model.Hikes)
+    {
+        <div class="hikeContainer">
+            <div class="hikeContainer_topBlock">
+            <div class="hikeName">@i.Name</div>
+            @if(i.PlacesLeft != 0) 
+            {
+                <button class="myBtn" onclick="RegistrationToHikeOpen(@i.HikeId)">Принять участие</button><br />
+            }
+            else
+            {
+                <div class="cap"></div>
+            }
+            </div>
+            <img class="hikePhoto" src="\Images\HikesPhotos\@i.Photo"></img><br />
+            <div class="hikeInfoContainer">
+                <div class="hikeInfo"><b>Руководитель: </b>@i.Head</div><br>                
+                <div class="hikeInfo"><b>Дата начала: </b>@i.DateBegin.ToShortDateString() </div><br>
+                <div class="hikeInfo"><b>Дата конца: </b>@i.DateEnd.ToShortDateString() </div><br>
+                <div class="hikeInfo"><b>Сложность: </b>@i.Difficulty</div><br>
+                <div class="hikeInfo"><b>Тип байдарок: </b>@i.Kayak</div><br>
+                <div class="hikeInfo"><b>Осталось мест: </b>@i.PlacesLeft из @i.Places</div><br>
+                <div class="hikeInfo"><abbr title="@i.Path"><b>Маршрут: </b>@i.Path</abbr></div><br>    
+                <div class="hikeInfo"><b>Цена: </b>@i.Price грн.</div><br />                                               
+            </div>
+            <div class="hikeDescTitle" onclick="ExpandHikeDesc(@i.HikeId)">
+                <div class="hikeDescTitleText">Описание</div> 
+                <div class="hikeDescTitleImg">
+                    <img class="expandImg" id="imgExpand_@i.HikeId" src="\Images\expandBottom.png" />
+                </div><br />
+            </div>
+            <div class="hikeDesc" id="hikeDesc_@i.HikeId">@i.Description</div><br /> 
+        </div>
+    }
+</div>
+<div class="btnShowMore">
+    @if (Model.CountHikes > 2)
+    {
+    <button id="btnShowMore" class="button92" onclick="GetHikes()">Показать еще</button>
+    }
+</div>
+
+<div class="hikeContainerTemplate">
+    <div class="hikeContainer_topBlock">
+        <div class="hikeName">asa</div>
+        <button class="myBtn" >Принять участие</button><br />
+    </div>
+    <img class="hikePhoto"></img><br />
+    <div class="hikeInfoContainer">
+        <div class="hikeInfo"><b>Руководитель: </b></div><br>                
+        <div class="hikeInfo"><b>Дата начала: </b></div><br>
+        <div class="hikeInfo"><b>Дата конца: </b></div><br>
+        <div class="hikeInfo"><b>Сложность: </b></div><br>
+        <div class="hikeInfo"><b>Тип байдарок: </b></div><br>
+        <div class="hikeInfo"><b>Осталось мест: </b></div><br>
+        <div class="hikeInfo"><b>Маршрут: </b></div><br>    
+        <div class="hikeInfo"><b>Цена: </b> грн.</div><br />                                               
+    </div>
+    <div class="hikeDescTitle"><div class="hikeDescTitleText">Описание</div> <div class="hikeDescTitleImg"><img class="expandImg" src="\Images\expandBottom.png" /></div><br /></div>
+    <div class="hikeDesc"></div><br /> 
+</div>
+

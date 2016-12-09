@@ -32,7 +32,7 @@ E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Infrastructure.D
 E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Infrastructure.Data\bin\Debug\ru\EntityFramework.resources.dll
 E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Infrastructure.Data\bin\Debug\ru\EntityFramework.SqlServer.resources.dll
 E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Infrastructure.Data\obj\Debug\HikeApp.Infrastructure.Data.csprojResolveAssemblyReference.cache
-E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Infrastructure.Data\obj\Debug\HikeApp.Infrastructure.Data.dll
-E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Infrastructure.Data\obj\Debug\HikeApp.Infrastructure.Data.pdb
 E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Infrastructure.Data\obj\Debug\HikeApp.Infrastructure.Data.Migrations.tourist.resources
 E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Infrastructure.Data\obj\Debug\HikeApp.Infrastructure.Data.csproj.GenerateResource.Cache
+E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Infrastructure.Data\obj\Debug\HikeApp.Infrastructure.Data.dll
+E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Infrastructure.Data\obj\Debug\HikeApp.Infrastructure.Data.pdb

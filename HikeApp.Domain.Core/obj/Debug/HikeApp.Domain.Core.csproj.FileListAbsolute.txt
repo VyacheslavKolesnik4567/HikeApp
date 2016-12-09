@@ -10,3 +10,4 @@ E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Domain.Core\bin\
 E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Domain.Core\bin\Debug\Newtonsoft.Json.xml
 E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Domain.Core\obj\Debug\HikeApp.Domain.Core.dll
 E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Domain.Core\obj\Debug\HikeApp.Domain.Core.pdb
+E:\Институт\4 курс 1 семестр\HikeApp\HikeApp.Domain.Core\obj\Debug\HikeApp.Domain.Core.csprojResolveAssemblyReference.cache
