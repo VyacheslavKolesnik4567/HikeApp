@@ -48,6 +48,7 @@
     <Compile Include="IKayakRepository.cs" />
     <Compile Include="IPathRepository.cs" />
     <Compile Include="ITouristRepository.cs" />
+    <Compile Include="IUnitOfWork.cs" />
     <Compile Include="IUserProfileRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

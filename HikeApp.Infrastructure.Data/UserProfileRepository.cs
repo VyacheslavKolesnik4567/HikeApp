@@ -9,11 +9,10 @@ namespace HikeApp.Infrastructure.Data
     public class UserProfileRepository : IUserProfileRepository
     {
         private HikeContext db;
-        private bool disposed = false;
 
-        public UserProfileRepository()
+        public UserProfileRepository(HikeContext db)
         {
-            this.db = new HikeContext();
+            this.db = db;
         }
 
         public void Create(UserProfile item)
@@ -28,24 +27,6 @@ namespace HikeApp.Infrastructure.Data
                 db.UserProfiles.Remove(user);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        public virtual void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    db.Dispose();
-                }
-            }
-            this.disposed = true;
-        }
-
         public UserProfile GetUserProfile(int id)
         {
             return db.UserProfiles.Find(id);
@@ -54,11 +35,6 @@ namespace HikeApp.Infrastructure.Data
         public IEnumerable<UserProfile> GetUserProfilesList()
         {
             return db.UserProfiles.ToList();
-        }
-
-        public void Save()
-        {
-            db.SaveChanges();
         }
 
         public void Update(UserProfile item)

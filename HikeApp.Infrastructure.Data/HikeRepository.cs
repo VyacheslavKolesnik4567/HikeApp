@@ -9,11 +9,10 @@ namespace HikeApp.Infrastructure.Data
     public class HikeRepository : IHikeRepository
     {
         private HikeContext db;
-        private bool disposed = false;
 
-        public HikeRepository ()
+        public HikeRepository (HikeContext db)
         {
-            this.db = new HikeContext();
+            this.db = db;
         }
 
         public void Create(Hike item)
@@ -28,24 +27,6 @@ namespace HikeApp.Infrastructure.Data
                 db.Hikes.Remove(hike);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        public virtual void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    db.Dispose();
-                }
-            }
-            this.disposed = true;
-        }
-
         public Hike GetHike(int id)
         {
             return db.Hikes.Find(id);
@@ -54,11 +35,6 @@ namespace HikeApp.Infrastructure.Data
         public IEnumerable<Hike> GetHikesList()
         {
             return db.Hikes.ToList();
-        }
-
-        public void Save()
-        {
-            db.SaveChanges();
         }
 
         public void Update(Hike item)

@@ -9,11 +9,10 @@ namespace HikeApp.Infrastructure.Data
     public class CityRepository : ICityRepository
     {
         private HikeContext db;
-        private bool disposed = false;
 
-        public CityRepository()
+        public CityRepository(HikeContext db)
         {
-            this.db = new HikeContext();
+            this.db = db;
         }
 
         public void Create(City item)
@@ -28,24 +27,6 @@ namespace HikeApp.Infrastructure.Data
                 db.Cities.Remove(city);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        public virtual void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    db.Dispose();
-                }
-            }
-            this.disposed = true;
-        }
-
         public IEnumerable<City> GetCitiesList()
         {
             return db.Cities.ToList();
@@ -54,11 +35,6 @@ namespace HikeApp.Infrastructure.Data
         public City GetCity(int id)
         {
             return db.Cities.Find(id);
-        }
-
-        public void Save()
-        {
-            db.SaveChanges();
         }
 
         public void Update(City item)

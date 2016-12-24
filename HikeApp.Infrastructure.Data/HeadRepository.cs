@@ -9,11 +9,10 @@ namespace HikeApp.Infrastructure.Data
     public class HeadRepository : IHeadRepository
     {
         private HikeContext db;
-        private bool disposed = false;
 
-        public HeadRepository()
+        public HeadRepository(HikeContext db)
         {
-            this.db = new HikeContext();
+            this.db = db;
         }
 
         public void Create(Head item)
@@ -28,24 +27,6 @@ namespace HikeApp.Infrastructure.Data
                 db.Heads.Remove(head);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        public virtual void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    db.Dispose();
-                }
-            }
-            this.disposed = true;
-        }
-
         public Head GetHead(int id)
         {
             return db.Heads.Find(id);
@@ -54,11 +35,6 @@ namespace HikeApp.Infrastructure.Data
         public IEnumerable<Head> GetHeadsList()
         {
             return db.Heads.ToList();
-        }
-
-        public void Save()
-        {
-            db.SaveChanges();
         }
 
         public void Update(Head item)

@@ -28,15 +28,7 @@ namespace HikeApp.Util
 
         private void AddBindings()
         {
-            kernel.Bind<ITouristRepository>().To<TouristRepository>();
-            kernel.Bind<IUserProfileRepository>().To<UserProfileRepository>();
-            kernel.Bind<IHikeRepository>().To<HikeRepository>();
-            kernel.Bind<IHeadRepository>().To<HeadRepository>();
-            kernel.Bind<IHikePhotoRepository>().To<HikePhotoRepository>();
-            kernel.Bind<IHikeTouristRepository>().To<HikeTouristRepository>();
-            kernel.Bind<IKayakRepository>().To<KayakRepository>();
-            kernel.Bind<ICityRepository>().To<CityRepository>();
-            kernel.Bind<IPathRepository>().To<PathRepository>();
+            kernel.Bind<IUnitOfWork>().To<UnitOfWork>();
         }
     }
 }

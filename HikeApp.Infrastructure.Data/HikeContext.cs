@@ -6,8 +6,7 @@ namespace HikeApp.Infrastructure.Data
     public class HikeContext : DbContext
     {
         public HikeContext()
-        {
-        }
+        { }
 
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Tourist> Turists { get; set; }

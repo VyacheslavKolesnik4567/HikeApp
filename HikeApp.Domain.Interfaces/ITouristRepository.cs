@@ -4,13 +4,12 @@ using System.Collections.Generic;
 
 namespace HikeApp.Domain.Interfaces
 {
-    public interface ITouristRepository : IDisposable
+    public interface ITouristRepository
     {
         IEnumerable<Tourist> GetTouristsList();
         Tourist GetTourist(int id);
         void Create(Tourist item);
         void Update(Tourist item);
         void Delete(int id);
-        void Save();
     }
 }

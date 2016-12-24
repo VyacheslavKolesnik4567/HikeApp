@@ -9,11 +9,10 @@ namespace HikeApp.Infrastructure.Data
     public class HikePhotoRepository : IHikePhotoRepository
     {
         private HikeContext db;
-        private bool disposed = false;
 
-        public HikePhotoRepository()
+        public HikePhotoRepository(HikeContext db)
         {
-            this.db = new HikeContext();
+            this.db = db;
         }
 
         public void Create(HikePhoto item)
@@ -28,32 +27,9 @@ namespace HikeApp.Infrastructure.Data
                 db.HikePhotos.Remove(hikePhoto);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        public virtual void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    db.Dispose();
-                }
-            }
-            this.disposed = true;
-        }
-
         public IEnumerable<HikePhoto> GetHikePhotosList()
         {
             return db.HikePhotos.ToList();
-        }
-
-        public void Save()
-        {
-            db.SaveChanges();
         }
     }
 }

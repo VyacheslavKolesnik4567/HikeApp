@@ -9,11 +9,10 @@ namespace HikeApp.Infrastructure.Data
     public class KayakRepository : IKayakRepository
     {
         private HikeContext db;
-        private bool disposed = false;
 
-        public KayakRepository()
+        public KayakRepository(HikeContext db)
         {
-            this.db = new HikeContext();
+            this.db = db;
         }
 
         public void Create(Kayak item)
@@ -28,24 +27,6 @@ namespace HikeApp.Infrastructure.Data
                 db.Kayaks.Remove(kayak);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        public virtual void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    db.Dispose();
-                }
-            }
-            this.disposed = true;
-        }
-
         public Kayak GetKayak(int id)
         {
             return db.Kayaks.Find(id);
@@ -54,11 +35,6 @@ namespace HikeApp.Infrastructure.Data
         public IEnumerable<Kayak> GetKayaksList()
         {
             return db.Kayaks.ToList();
-        }
-
-        public void Save()
-        {
-            db.SaveChanges();
         }
 
         public void Update(Kayak item)

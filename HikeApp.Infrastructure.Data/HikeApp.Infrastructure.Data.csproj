@@ -64,6 +64,7 @@
     <Compile Include="PathRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TouristRepository.cs" />
+    <Compile Include="UnitOfWork.cs" />
     <Compile Include="UserProfileRepository.cs" />
   </ItemGroup>
   <ItemGroup>

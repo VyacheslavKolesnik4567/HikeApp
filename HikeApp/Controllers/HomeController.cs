@@ -14,34 +14,18 @@ namespace HikeApp.Controllers
     [InitializeSimpleMembership]
     public class HomeController : Controller
     {
-        IHikeRepository hikeRepository;
-        IKayakRepository kayakRepository;
-        IPathRepository pathRepository;
-        IHikeTouristRepository hikeTouristRepository;
-        IHeadRepository headRepository;
-        IHikePhotoRepository hikePhotoRepository;
-        ITouristRepository touristRepository;
-        IUserProfileRepository userProfileRepository;
+        IUnitOfWork db;
 
-        public HomeController(IHikeRepository hikeRepo, IKayakRepository kayakRepo, IPathRepository pathRepo,
-            IHikeTouristRepository hikeTouristRepo, IHeadRepository headRepo, IHikePhotoRepository hikePhotoRepo,
-            ITouristRepository touristRepo, IUserProfileRepository userProfileRepo)
+        public HomeController(IUnitOfWork unitOfWork)
         {
-            hikeRepository = hikeRepo;
-            kayakRepository = kayakRepo;
-            pathRepository = pathRepo;
-            hikeTouristRepository = hikeTouristRepo;
-            headRepository = headRepo;
-            hikePhotoRepository = hikePhotoRepo;
-            touristRepository = touristRepo;
-            userProfileRepository = userProfileRepo;
+            db = unitOfWork;
         }
 
         public ActionResult Index()
         {
             try
             {
-                var hikesList = hikeRepository.GetHikesList();
+                var hikesList = db.Hikes.GetHikesList();
 
                 HomeIndexViewModel model = new HomeIndexViewModel();
                 //Set future hikes count
@@ -50,17 +34,17 @@ namespace HikeApp.Controllers
                 foreach (var i in hikesList.Take(2))
                 {
                     //Get hike's kayak
-                    var kayak = kayakRepository.GetKayak(i.KayakId);
+                    var kayak = db.Kayaks.GetKayak(i.KayakId);
                     //Get hike's head
-                    var head = headRepository.GetHead(i.HeadId);
+                    var head = db.Heads.GetHead(i.HeadId);
                     //Get hike's first photo
-                    var photo = hikePhotoRepository.GetHikePhotosList().FirstOrDefault(x => x.HikeId == i.HikeId);
+                    var photo = db.HikePhotos.GetHikePhotosList().FirstOrDefault(x => x.HikeId == i.HikeId);
                     //Get hike's path
-                    var path = pathRepository.GetPath(i.PathId);
+                    var path = db.Paths.GetPath(i.PathId);
                     HikeFullDescription hikeFullDesc = new HikeFullDescription();
                     hikeFullDesc.HikeId = i.HikeId;
                     hikeFullDesc.Places = kayak.CountPlaces * i.CountKayak;
-                    hikeFullDesc.PlacesLeft = hikeFullDesc.Places - hikeTouristRepository.GetHikeTouristsList().Count(x=>x.HikeId == i.HikeId);
+                    hikeFullDesc.PlacesLeft = hikeFullDesc.Places - db.HikeTourists.GetHikeTouristsList().Count(x=>x.HikeId == i.HikeId);
                     hikeFullDesc.DateBegin = i.DateBegin;
                     hikeFullDesc.DateEnd = i.DateEnd;
                     hikeFullDesc.Difficulty = i.Difficulty;
@@ -81,7 +65,7 @@ namespace HikeApp.Controllers
 
                 if (WebSecurity.IsAuthenticated)
                 {
-                    var currentUser = userProfileRepository.GetUserProfile(WebSecurity.CurrentUserId);
+                    var currentUser = db.UserProfiles.GetUserProfile(WebSecurity.CurrentUserId);
                     model.IsTourist = currentUser.TouristId != null ? true : false;
                 }
                 else
@@ -101,22 +85,22 @@ namespace HikeApp.Controllers
             try
             {
                 List<HikeFullDescription> hikes = new List<HikeFullDescription>();
-                var hikeList = hikeRepository.GetHikesList();
+                var hikeList = db.Hikes.GetHikesList();
                 var futureHikeList = hikeList.Where(x => x.DateBegin > DateTime.Now)
                     .Skip(skip).Take(take);
 
                 foreach (var i in futureHikeList)
                 {
                     //Get hike's kayak
-                    var kayak = kayakRepository.GetKayak(i.KayakId);
+                    var kayak = db.Kayaks.GetKayak(i.KayakId);
                     //Get hike's head
-                    var head = headRepository.GetHead(i.HeadId);
+                    var head = db.Heads.GetHead(i.HeadId);
                     //Get hike's first photo
-                    var photo = hikePhotoRepository.GetHikePhotosList().FirstOrDefault(x => x.HikeId == i.HikeId);
+                    var photo = db.HikePhotos.GetHikePhotosList().FirstOrDefault(x => x.HikeId == i.HikeId);
                     //Get hike's all tourist
-                    var hikeTourist = hikeTouristRepository.GetHikeTouristsList().Where(x => x.HikeId == i.HikeId);
+                    var hikeTourist = db.HikeTourists.GetHikeTouristsList().Where(x => x.HikeId == i.HikeId);
                     //Get hike's path
-                    var hikePath = pathRepository.GetPath(i.PathId);
+                    var hikePath = db.Paths.GetPath(i.PathId);
 
                     HikeFullDescription hikeFullDesc = new HikeFullDescription();
                     hikeFullDesc.HikeId = i.HikeId;
@@ -158,13 +142,13 @@ namespace HikeApp.Controllers
             {
                 object hikeInfo = new object();
 
-                var hike = hikeRepository.GetHike(hikeId);
+                var hike = db.Hikes.GetHike(hikeId);
                 //Get hike's head
-                var head = headRepository.GetHead(hike.HeadId);
+                var head = db.Heads.GetHead(hike.HeadId);
                 //Get hike's path
-                var path = pathRepository.GetPath(hike.PathId);
+                var path = db.Paths.GetPath(hike.PathId);
                 //Get hike's kayak
-                var kayak = kayakRepository.GetKayak(hike.KayakId);
+                var kayak = db.Kayaks.GetKayak(hike.KayakId);
 
                 hikeInfo = new
                 {
@@ -188,9 +172,9 @@ namespace HikeApp.Controllers
         {
             try
             {
-                var hike = hikeRepository.GetHike(hikeId);
+                var hike = db.Hikes.GetHike(hikeId);
                 //Get hike's kayak
-                var kayak = kayakRepository.GetKayak(hike.KayakId);
+                var kayak = db.Kayaks.GetKayak(hike.KayakId);
             
                 //Return hike's kayak info
                 return (new
@@ -211,7 +195,7 @@ namespace HikeApp.Controllers
             try
             {
                 //Get all hike tourists
-                var hikeTourists = hikeTouristRepository.GetHikeTouristsList().Where(x=>x.HikeId == hikeId);
+                var hikeTourists = db.HikeTourists.GetHikeTouristsList().Where(x=>x.HikeId == hikeId);
 
                 //Confirmed tourists info list
                 List<object> touristsInfo = new List<object>();
@@ -221,7 +205,7 @@ namespace HikeApp.Controllers
                 {
                     if (i.Confirmed)
                     {
-                        var tourist = touristRepository.GetTourist(i.TouristId);
+                        var tourist = db.Tourists.GetTourist(i.TouristId);
 
                         touristsInfo.Add(new
                         {
@@ -249,7 +233,7 @@ namespace HikeApp.Controllers
                 //If user doesn't registered
                 if (!WebSecurity.IsAuthenticated)
                 {
-                    touristRepository.Create(new Tourist()
+                    db.Tourists.Create(new Tourist()
                     {
                         TouristFirstName = firstName,
                         TouristLastName = lastName,
@@ -259,12 +243,12 @@ namespace HikeApp.Controllers
                     });
 
                     //Find user's touristID
-                    int touristId = touristRepository.GetTouristsList()
+                    int touristId = db.Tourists.GetTouristsList()
                         .Where(x => x.TouristFirstName == firstName && x.TouristLastName == lastName)
                         .FirstOrDefault().TouristId;
 
                     //Add new tourist to hike
-                    hikeTouristRepository.Create(new HikeTourist()
+                    db.HikeTourists.Create(new HikeTourist()
                     {
                         HikeId = hikeId,
                         TouristId = touristId,
@@ -279,13 +263,13 @@ namespace HikeApp.Controllers
                 else
                 {
                     //Try to find user's tourist id 
-                    UserProfile currentUser = userProfileRepository.GetUserProfile(WebSecurity.CurrentUserId);
+                    UserProfile currentUser = db.UserProfiles.GetUserProfile(WebSecurity.CurrentUserId);
                     int? touristId = currentUser.TouristId;
 
                     if (touristId != null)
                     {
                         //Add new tourist to hike
-                        hikeTouristRepository.Create(new HikeTourist()
+                        db.HikeTourists.Create(new HikeTourist()
                         {
                             HikeId = hikeId,
                             TouristId = (int)touristId,
@@ -301,7 +285,7 @@ namespace HikeApp.Controllers
                     else
                     {
                         //Create new tourist
-                        touristRepository.Create(new Tourist()
+                        db.Tourists.Create(new Tourist()
                         {
                             TouristFirstName = firstName,
                             TouristLastName = lastName,
@@ -311,19 +295,19 @@ namespace HikeApp.Controllers
                         });
 
                         //Get new tourist ID
-                        int newTouristId = touristRepository.GetTouristsList()
+                        int newTouristId = db.Tourists.GetTouristsList()
                             .Where(x => x.TouristFirstName == firstName && x.TouristLastName == lastName)
                             .FirstOrDefault().TouristId;
 
                         //Set current user tourist ID 
 
-                        var user = userProfileRepository.GetUserProfile(WebSecurity.CurrentUserId);
+                        var user = db.UserProfiles.GetUserProfile(WebSecurity.CurrentUserId);
                         user.UserId = newTouristId;
-                        userProfileRepository.Update(user);
-                        userProfileRepository.Save();
+                        db.UserProfiles.Update(user);
+                        db.Save();
 
                         //Add new tourist to hike
-                        hikeTouristRepository.Create(new HikeTourist()
+                        db.HikeTourists.Create(new HikeTourist()
                         {
                             HikeId = hikeId,
                             TouristId = newTouristId,
@@ -348,7 +332,7 @@ namespace HikeApp.Controllers
             try
             {
                 //Create new tourist
-                touristRepository.Create(new Tourist()
+                db.Tourists.Create(new Tourist()
                 {
                     TouristFirstName = firstName,
                     TouristLastName = lastName,
@@ -369,15 +353,7 @@ namespace HikeApp.Controllers
 
         protected override void Dispose(bool disposing)
         {
-            hikeRepository.Dispose();
-            kayakRepository.Dispose();
-            pathRepository.Dispose();
-            hikeTouristRepository.Dispose();
-            headRepository.Dispose();
-            hikePhotoRepository.Dispose();
-            userProfileRepository.Dispose();
-            touristRepository.Dispose();
-
+            db.Dispose();
             base.Dispose(disposing);
         }
     }  

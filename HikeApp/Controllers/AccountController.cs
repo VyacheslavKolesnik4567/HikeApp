@@ -18,20 +18,16 @@ namespace HikeApp.Controllers
     [InitializeSimpleMembership]
     public class AccountController : Controller
     {
-        private ITouristRepository touristRepository;
-        private IUserProfileRepository userProfileRepository;
+        private IUnitOfWork db;
 
-        public AccountController(ITouristRepository tourRepo, IUserProfileRepository userRepo)
+        public AccountController(IUnitOfWork unitOfWork)
         {
-            touristRepository = tourRepo;
-            userProfileRepository = userRepo;
+            db = unitOfWork;
         }
 
         protected override void Dispose(bool disposing)
         {
-            touristRepository.Dispose();
-            userProfileRepository.Dispose();
-
+            db.Dispose();
             base.Dispose(disposing);
         }
 
@@ -107,7 +103,7 @@ namespace HikeApp.Controllers
                         DateTime birthday = new DateTime(int.Parse(date[2]), int.Parse(date[1]), int.Parse(date[0]));
 
                         //Create new tourist
-                        touristRepository.Create(
+                        db.Tourists.Create(
                             new Tourist()
                             {
                                 TouristFirstName = model.FirstName,
@@ -118,18 +114,18 @@ namespace HikeApp.Controllers
                             });
 
                         //Save new tourist
-                        touristRepository.Save();
+                        db.Save();
 
                         //Get new tourist ID
-                        int newTouristId = touristRepository.GetTouristsList()
+                        int newTouristId = db.Tourists.GetTouristsList()
                             .Where(x => x.TouristFirstName == model.FirstName && x.TouristLastName == model.LastName)
                             .FirstOrDefault().TouristId;
 
                         //Set current user new tourist ID
-                        var user = userProfileRepository.GetUserProfile(WebSecurity.GetUserId(model.UserName));
+                        var user = db.UserProfiles.GetUserProfile(WebSecurity.GetUserId(model.UserName));
                         user.TouristId = newTouristId;
-                        userProfileRepository.Update(user);
-                        userProfileRepository.Save();
+                        db.UserProfiles.Update(user);
+                        db.Save();
                     }
                     return RedirectToAction("Index", "Home");
                 }
@@ -316,13 +312,13 @@ namespace HikeApp.Controllers
                 {
 
                     // Добавление нового пользователя в базу данных
-                    UserProfile user = userProfileRepository.GetUserProfilesList().FirstOrDefault(u => u.UserName.ToLower() == model.UserName.ToLower());
+                    UserProfile user = db.UserProfiles.GetUserProfilesList().FirstOrDefault(u => u.UserName.ToLower() == model.UserName.ToLower());
                     // Проверка наличия пользователя в базе данных
                     if (user == null)
                     {
                         // Добавление имени в таблицу профиля
-                        userProfileRepository.Create(new UserProfile { UserName = model.UserName });
-                        userProfileRepository.Save();
+                        db.UserProfiles.Create(new UserProfile { UserName = model.UserName });
+                        db.Save();
 
                         OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, model.UserName);
                         OAuthWebSecurity.Login(provider, providerUserId, createPersistentCookie: false);

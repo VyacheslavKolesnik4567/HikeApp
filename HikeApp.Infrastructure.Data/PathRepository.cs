@@ -9,11 +9,10 @@ namespace HikeApp.Infrastructure.Data
     public class PathRepository : IPathRepository
     {
         private HikeContext db;
-        private bool disposed = false;
 
-        public PathRepository()
+        public PathRepository(HikeContext db)
         {
-            this.db = new HikeContext();
+            this.db = db;
         }
 
         public void Create(Path item)
@@ -28,24 +27,6 @@ namespace HikeApp.Infrastructure.Data
                 db.Paths.Remove(path);
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        public virtual void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    db.Dispose();
-                }
-            }
-            this.disposed = true;
-        }
-
         public Path GetPath(int id)
         {
             return db.Paths.Find(id);
@@ -54,11 +35,6 @@ namespace HikeApp.Infrastructure.Data
         public IEnumerable<Path> GetPathsList()
         {
             return db.Paths.ToList();
-        }
-
-        public void Save()
-        {
-            db.SaveChanges();
         }
 
         public void Update(Path item)

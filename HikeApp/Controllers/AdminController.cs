@@ -16,29 +16,11 @@ namespace HikeApp.Controllers
     [InitializeSimpleMembership]
     public class AdminController : Controller
     {
-        IHikeRepository hikeRepository;
-        IKayakRepository kayakRepository;
-        IPathRepository pathRepository;
-        IHikeTouristRepository hikeTouristRepository;
-        IHeadRepository headRepository;
-        IHikePhotoRepository hikePhotoRepository;
-        ITouristRepository touristRepository;
-        IUserProfileRepository userProfileRepository;
-        ICityRepository cityRepository;
+        IUnitOfWork db;
 
-        public AdminController(IHikeRepository hikeRepo, IKayakRepository kayakRepo, IPathRepository pathRepo,
-        IHikeTouristRepository hikeTouristRepo, IHeadRepository headRepo, IHikePhotoRepository hikePhotoRepo,
-            ITouristRepository touristRepo, IUserProfileRepository userProfileRepo, ICityRepository cityRepo)
+        public AdminController(IUnitOfWork unitOfWork)
         {
-            hikeRepository = hikeRepo;
-            kayakRepository = kayakRepo;
-            pathRepository = pathRepo;
-            hikeTouristRepository = hikeTouristRepo;
-            headRepository = headRepo;
-            hikePhotoRepository = hikePhotoRepo;
-            touristRepository = touristRepo;
-            userProfileRepository = userProfileRepo;
-            cityRepository = cityRepo;
+            db = unitOfWork;
         }
 
     [Authorize(Roles = "Admin")]
@@ -62,10 +44,10 @@ namespace HikeApp.Controllers
             try
             {
                 List<object> jsonHikes = new List<object>();
-                var hikes = hikeRepository.GetHikesList();
+                var hikes = db.Hikes.GetHikesList();
                 foreach (var i in hikes)
                 {
-                    var hikeTourists = hikeTouristRepository.GetHikeTouristsList()
+                    var hikeTourists = db.HikeTourists.GetHikeTouristsList()
                         .Where(x => x.HikeId == i.HikeId);
 
                     jsonHikes.Add(new
@@ -96,7 +78,7 @@ namespace HikeApp.Controllers
         {
             try
             {
-                hikeRepository.Update(new Hike() {
+                db.Hikes.Update(new Hike() {
                     HikeId = Id,
                     HeadId = HeadId,
                     KayakId = KayakId,
@@ -107,7 +89,7 @@ namespace HikeApp.Controllers
                     Difficulty = Difficulty,
                 });
 
-                hikeRepository.Save();
+                db.Save();
             }
             catch { }
         }
@@ -117,7 +99,7 @@ namespace HikeApp.Controllers
         {
             try
             {
-                hikeRepository.Create(new Hike()
+                db.Hikes.Create(new Hike()
                 {
                     HeadId = HeadId,
                     KayakId = KayakId,
@@ -128,7 +110,7 @@ namespace HikeApp.Controllers
                     Difficulty = Difficulty,
                 });
 
-                hikeRepository.Save();
+                db.Save();
             }
             catch { }
         }
@@ -137,8 +119,8 @@ namespace HikeApp.Controllers
         {
             try
             {
-                hikeRepository.Delete(hikeId);
-                hikeRepository.Save();
+                db.Hikes.Delete(hikeId);
+                db.Save();
             }
             catch { }
         }
@@ -150,12 +132,12 @@ namespace HikeApp.Controllers
         {
             try
             {
-                var hikeTourists = hikeTouristRepository.GetHikeTouristsList()
+                var hikeTourists = db.HikeTourists.GetHikeTouristsList()
                     .Where(x=>x.HikeId == hikeId);
                 List<object> touristsInfoList = new List<object>();
                 foreach (var i in hikeTourists)
                 {
-                    var tourist = touristRepository.GetTourist(i.TouristId);
+                    var tourist = db.Tourists.GetTourist(i.TouristId);
 
                     touristsInfoList.Add(new
                     {
@@ -183,8 +165,8 @@ namespace HikeApp.Controllers
         {
             try
             {
-                hikeTouristRepository.Delete(hikeTouristId);
-                hikeTouristRepository.Save();
+                db.HikeTourists.Delete(hikeTouristId);
+                db.Save();
             }
             catch { }
         }
@@ -196,7 +178,7 @@ namespace HikeApp.Controllers
                 bool confirm;
                 if (bool.TryParse(confirmed, out confirm))
                 {
-                    hikeTouristRepository.Create(new HikeTourist()
+                    db.HikeTourists.Create(new HikeTourist()
                     {
                         HikeId = hikeId,
                         TouristId = touristId,
@@ -204,7 +186,7 @@ namespace HikeApp.Controllers
                         PlaceNumber = placeNumber,
                         Confirmed = confirm
                     });
-                    hikeTouristRepository.Save();
+                    db.Save();
                 }
             }
             catch { }
@@ -214,14 +196,14 @@ namespace HikeApp.Controllers
         {
             try
             {
-                hikeTouristRepository.Update(new HikeTourist() {
+                db.HikeTourists.Update(new HikeTourist() {
                     HikeTouristId = Id,
                     KayakNumber = KayakNumber,
                     PlaceNumber = PlaceNumber,
                     Confirmed = Confirmed,
                     TouristId = TouristId            
                 });
-                hikeTouristRepository.Save();
+                db.Save();
 
             }
             catch { }
@@ -231,7 +213,7 @@ namespace HikeApp.Controllers
         {
             try
             {
-                return touristRepository.GetTouristsList()
+                return db.Tourists.GetTouristsList()
                     .ToDictionary(x => x.TouristId, y => y.TouristFirstName + " " + y.TouristLastName).ToJson();
             }
             catch 
@@ -244,7 +226,7 @@ namespace HikeApp.Controllers
         {
             try
             {
-                return hikeRepository.GetHike(hikeId).CountKayak;
+                return db.Hikes.GetHike(hikeId).CountKayak;
             }
             catch 
             {
@@ -256,7 +238,7 @@ namespace HikeApp.Controllers
         {
             try
             {
-                var kayak = kayakRepository.GetKayak(hikeRepository.GetHike(hikeId).KayakId);
+                var kayak = db.Kayaks.GetKayak(db.Hikes.GetHike(hikeId).KayakId);
                 return kayak.CountPlaces;
             }
             catch
@@ -272,7 +254,7 @@ namespace HikeApp.Controllers
         {
             try
             {
-                var tourists = touristRepository.GetTouristsList();
+                var tourists = db.Tourists.GetTouristsList();
 
                 List<object> touristsInfoList = new List<object>();
                 foreach (var i in tourists)
@@ -290,7 +272,7 @@ namespace HikeApp.Controllers
                         Birthday = i.Birthday.ToShortDateString(),
                         Gender = gender,
                         Phone = i.Phone,
-                        Registered = userProfileRepository.GetUserProfilesList()
+                        Registered = db.UserProfiles.GetUserProfilesList()
                             .Count(x => x.TouristId == i.TouristId) != 0 ? true : false
                     });
                 }
@@ -307,8 +289,8 @@ namespace HikeApp.Controllers
         {
             try
             {
-                touristRepository.Delete(touristId);
-                touristRepository.Save();
+                db.Tourists.Delete(touristId);
+                db.Save();
             }
             catch
             { }
@@ -318,7 +300,7 @@ namespace HikeApp.Controllers
         {
             try
             {
-                touristRepository.Create(new Tourist()
+                db.Tourists.Create(new Tourist()
                 {
                     TouristFirstName = FirstName,
                     TouristLastName = LastName,
@@ -326,7 +308,7 @@ namespace HikeApp.Controllers
                     Gender = Gender,
                     Phone = Phone
                 });
-                touristRepository.Save();
+                db.Save();
             }
             catch { }
         }
@@ -335,7 +317,7 @@ namespace HikeApp.Controllers
         {
             try
             {
-                touristRepository.Update(new Tourist()
+                db.Tourists.Update(new Tourist()
                 {
                     TouristId = Id,
                     TouristFirstName = FirstName,
@@ -344,7 +326,7 @@ namespace HikeApp.Controllers
                     Gender = Gender,
                     Phone = Phone
                 });
-                touristRepository.Save();
+                db.Save();
             }
             catch { }
         }
@@ -356,7 +338,7 @@ namespace HikeApp.Controllers
         {
             try
             {
-                var paths = pathRepository.GetPathsList();
+                var paths = db.Paths.GetPathsList();
                 var pathsObj = new List<object>();
                 foreach (var i in paths)
                     pathsObj.Add(new
@@ -380,14 +362,14 @@ namespace HikeApp.Controllers
         {
             try
             {
-                pathRepository.Create(new Domain.Core.Path()
+                db.Paths.Create(new Domain.Core.Path()
                 {
                     WayName = WayName,
                     Way = Way,
                     WayPrice = Price,
                     WayDescription = Description
                 });
-                pathRepository.Save();
+                db.Save();
             }
             catch { }
         }
@@ -396,7 +378,7 @@ namespace HikeApp.Controllers
         {
             try
             {
-                pathRepository.Update(new Domain.Core.Path()
+                db.Paths.Update(new Domain.Core.Path()
                 {
                     PathId = Id,
                     WayName = WayName,
@@ -404,7 +386,7 @@ namespace HikeApp.Controllers
                     WayPrice = Price,
                     WayDescription = Description
                 });
-                pathRepository.Save();
+                db.Save();
             }
             catch { }
         }
@@ -413,8 +395,8 @@ namespace HikeApp.Controllers
         {
             try
             {
-                pathRepository.Delete(pathId);
-                pathRepository.Save();
+                db.Paths.Delete(pathId);
+                db.Save();
             }
             catch { }
         }
@@ -426,7 +408,7 @@ namespace HikeApp.Controllers
         {
             try
             {
-                return cityRepository.GetCitiesList().ToJson();
+                return db.Cities.GetCitiesList().ToJson();
             }
             catch
             {
@@ -438,8 +420,8 @@ namespace HikeApp.Controllers
         {
             try
             {
-                cityRepository.Create(new City() { CityName = name });
-                cityRepository.Save();
+                db.Cities.Create(new City() { CityName = name });
+                db.Save();
             }
             catch { }
         }
@@ -448,11 +430,11 @@ namespace HikeApp.Controllers
         {
             try
             {
-                cityRepository.Update(new City() {
+                db.Cities.Update(new City() {
                     CityId = id,
                     CityName = name
                 });
-                cityRepository.Save();
+                db.Save();
             }
             catch { }
         }
@@ -461,8 +443,8 @@ namespace HikeApp.Controllers
         {
             try
             {
-                cityRepository.Delete(cityId);
-                cityRepository.Save();
+                db.Cities.Delete(cityId);
+                db.Save();
             }
             catch { }
         }
@@ -475,7 +457,7 @@ namespace HikeApp.Controllers
             try
             {
                 List<object> heads = new List<object>();
-                foreach (var i in headRepository.GetHeadsList())
+                foreach (var i in db.Heads.GetHeadsList())
                 {
                     heads.Add(new
                     {
@@ -498,12 +480,12 @@ namespace HikeApp.Controllers
         {
             try
             {
-                headRepository.Create(new Head() {
+                db.Heads.Create(new Head() {
                     HeadFirstName = FirstName,
                     HeadLastName = LastName,
                     Birthday = Birthday
                 });
-                headRepository.Save();
+                db.Save();
             }
             catch { }
         }
@@ -512,14 +494,14 @@ namespace HikeApp.Controllers
         {
             try
             {
-                headRepository.Update(new Head()
+                db.Heads.Update(new Head()
                 {
                     HeadId = Id,
                     HeadFirstName = FirstName,
                     HeadLastName = LastName,
                     Birthday = Birthday
                 });
-                headRepository.Save();
+                db.Save();
             }
             catch { }
         }
@@ -528,8 +510,8 @@ namespace HikeApp.Controllers
         {
             try
             {
-                headRepository.Delete(headId);
-                headRepository.Save();
+                db.Heads.Delete(headId);
+                db.Save();
             }
             catch { }
         }
@@ -542,7 +524,7 @@ namespace HikeApp.Controllers
             try
             {
                 var kayaksJson = new List<object>();
-                foreach (var i in kayakRepository.GetKayaksList())
+                foreach (var i in db.Kayaks.GetKayaksList())
                 {
                     kayaksJson.Add(new
                     {
@@ -566,14 +548,14 @@ namespace HikeApp.Controllers
         {
             try
             {
-                kayakRepository.Create(new Kayak()
+                db.Kayaks.Create(new Kayak()
                 {
                     Name = Name,
                     CountPlaces = CountPlaces,
                     Capacity = Capacity,
                     Price = Price
                 });
-                kayakRepository.Save();
+                db.Save();
             }
             catch { }
         }
@@ -582,7 +564,7 @@ namespace HikeApp.Controllers
         {
             try
             {
-                kayakRepository.Update(new Kayak()
+                db.Kayaks.Update(new Kayak()
                 {
                     KayakId = Id,
                     Name = Name,
@@ -590,7 +572,7 @@ namespace HikeApp.Controllers
                     Capacity = Capacity,
                     Price = Price
                 });
-                kayakRepository.Save();
+                db.Save();
             }
             catch { }
         }
@@ -599,8 +581,8 @@ namespace HikeApp.Controllers
         {
             try
             {
-                kayakRepository.Delete(kayakId);
-                kayakRepository.Save();
+                db.Kayaks.Delete(kayakId);
+                db.Save();
             }
             catch { }
         }
@@ -614,9 +596,9 @@ namespace HikeApp.Controllers
             {
                 return new
                 {
-                    hikePhotosLocation = hikePhotoRepository.GetHikePhotosList()
+                    hikePhotosLocation = db.HikePhotos.GetHikePhotosList()
                         .Where(x=>x.HikeId == hikeId).ToJson(),
-                    hikePath = pathRepository.GetPath(hikeRepository.GetHike(hikeId).PathId).Way
+                    hikePath = db.Paths.GetPath(db.Hikes.GetHike(hikeId).PathId).Way
                 }.ToJson();
             }
             catch
@@ -668,12 +650,12 @@ namespace HikeApp.Controllers
         {
             try
             {
-                hikePhotoRepository.Create(new HikePhoto()
+                db.HikePhotos.Create(new HikePhoto()
                 {
                     HikeId = hikeId,
                     Location = photoLocation
                 });
-                hikePhotoRepository.Save();
+                db.Save();
             }
             catch { }
         }
@@ -682,8 +664,8 @@ namespace HikeApp.Controllers
         {
             try
             {
-                hikePhotoRepository.Delete(photoId);
-                hikePhotoRepository.Save();
+                db.HikePhotos.Delete(photoId);
+                db.Save();
             }
             catch { }
         }
@@ -698,9 +680,9 @@ namespace HikeApp.Controllers
                 Dictionary<int, int> activity = new Dictionary<int, int>();
                 for (int i = 1; i < 13; i++)
                 {
-                    int count = hikeTouristRepository.GetHikeTouristsList()
+                    int count = db.HikeTourists.GetHikeTouristsList()
                         .Count(x=> {
-                            var hike = hikeRepository.GetHike(x.HikeId);
+                            var hike = db.Hikes.GetHike(x.HikeId);
                             if (hike.DateBegin.Month == i || hike.DateEnd.Month == i)
                                 return true;
                             else
@@ -723,7 +705,7 @@ namespace HikeApp.Controllers
             try
             {
                 List<int> list = new List<int>();
-                var hikes = hikeRepository.GetHikesList()
+                var hikes = db.Hikes.GetHikesList()
                     .Select(x => new { dateB = x.DateBegin, dateE = x.DateEnd });
                 foreach (var i in hikes)
                     list.Add((i.dateE - i.dateB).Days);
@@ -741,7 +723,7 @@ namespace HikeApp.Controllers
             try
             {
                 List<int> touristsStrength = new List<int>();
-                var tourists = touristRepository.GetTouristsList()
+                var tourists = db.Tourists.GetTouristsList()
                     .Select(x => x.Birthday);
 
                 foreach (var i in tourists)
@@ -761,11 +743,11 @@ namespace HikeApp.Controllers
             {
                 List<object> headsHikes = new List<object>();
                 //Get all hike's heads
-                foreach (var i in headRepository.GetHeadsList())
+                foreach (var i in db.Heads.GetHeadsList())
                 {
                     List<object> hikes = new List<object>();
                     //Get head's hikes
-                    var headHikes = hikeRepository.GetHikesList().Where(x => x.HeadId == i.HeadId);
+                    var headHikes = db.Hikes.GetHikesList().Where(x => x.HeadId == i.HeadId);
 
                     //Seed head's hikes info list
                     foreach (var k in headHikes)
@@ -773,13 +755,13 @@ namespace HikeApp.Controllers
 
                         List<object> hikeTouristsInfoList = new List<object>();
                         //Get hike's tourist list
-                        var hikeTouristsList = hikeTouristRepository.GetHikeTouristsList()
+                        var hikeTouristsList = db.HikeTourists.GetHikeTouristsList()
                             .Where(x => x.HikeId == k.HikeId);
 
                         //Seed hike's tourist info list for current hike
                         foreach (var l in hikeTouristsList)
                         {
-                            var tourist = touristRepository.GetTourist(l.TouristId);
+                            var tourist = db.Tourists.GetTourist(l.TouristId);
                      
                             hikeTouristsInfoList.Add(new
                             {
@@ -790,14 +772,14 @@ namespace HikeApp.Controllers
                         }
 
                         //Get current hike's path
-                        var path = pathRepository.GetPath(k.PathId);
+                        var path = db.Paths.GetPath(k.PathId);
 
                         //Seed current head's hikes info list
                         hikes.Add(new
                         {
                             headName = i.HeadFirstName + " " + i.HeadLastName,
                             hikeId = k.HikeId,
-                            kayakName = kayakRepository.GetKayak(k.KayakId).Name,
+                            kayakName = db.Kayaks.GetKayak(k.KayakId).Name,
                             way = path.Way,
                             difficulty = k.Difficulty,
                             dateBegin = k.DateBegin.ToShortDateString(),
@@ -828,20 +810,20 @@ namespace HikeApp.Controllers
             {
                 List<object> hikes = new List<object>();
                 //Get head's hikes
-                var headHikes = hikeRepository.GetHikesList().Where(x => x.HeadId == headId);
+                var headHikes = db.Hikes.GetHikesList().Where(x => x.HeadId == headId);
 
                 //Seed head's hikes info list
                 foreach (var k in headHikes)
                 {
-                    var head = headRepository.GetHead(headId);
+                    var head = db.Heads.GetHead(headId);
                     List<object> hikeTouristsListObj = new List<object>();
                     //Get hike's tourist list
-                    var hikeTourists = hikeTouristRepository.GetHikeTouristsList().Where(x => x.HikeId == k.HikeId);
+                    var hikeTourists = db.HikeTourists.GetHikeTouristsList().Where(x => x.HikeId == k.HikeId);
                     
                     //Seed hike's tourist info list for current hike
                     foreach (var l in hikeTourists)
                     {
-                        var tourist = touristRepository.GetTourist(l.TouristId);
+                        var tourist = db.Tourists.GetTourist(l.TouristId);
 
                         hikeTouristsListObj.Add(new
                         {
@@ -852,13 +834,13 @@ namespace HikeApp.Controllers
                     }
 
                     //Get current hike's path
-                    var path = pathRepository.GetPath(k.PathId);
+                    var path = db.Paths.GetPath(k.PathId);
                     //Seed head's hikes info list
                     hikes.Add(new
                     {
                         headName = head.HeadFirstName + " " + head.HeadLastName,
                         hikeId = k.HikeId,
-                        kayakName = kayakRepository.GetKayak(k.KayakId).Name,
+                        kayakName = db.Kayaks.GetKayak(k.KayakId).Name,
                         way = path.Way,
                         difficulty = k.Difficulty,
                         dateBegin = k.DateBegin.ToShortDateString(),
@@ -883,16 +865,7 @@ namespace HikeApp.Controllers
 
         protected override void Dispose(bool disposing)
         {
-            hikeRepository.Dispose();
-            kayakRepository.Dispose();
-            pathRepository.Dispose();
-            hikeTouristRepository.Dispose();
-            headRepository.Dispose();
-            hikePhotoRepository.Dispose();
-            userProfileRepository.Dispose();
-            cityRepository.Dispose();
-            touristRepository.Dispose();
-
+            db.Dispose();
             base.Dispose(disposing);
         }
     }

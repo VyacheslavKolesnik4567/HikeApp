@@ -4,13 +4,12 @@ using System.Collections.Generic;
 
 namespace HikeApp.Domain.Interfaces
 {
-    public interface IUserProfileRepository: IDisposable
+    public interface IUserProfileRepository
     {
         IEnumerable<UserProfile> GetUserProfilesList();
         UserProfile GetUserProfile(int id);
         void Create(UserProfile item);
         void Update(UserProfile item);
         void Delete(int id);
-        void Save();
     }
 }
